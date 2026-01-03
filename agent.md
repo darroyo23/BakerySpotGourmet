@@ -347,58 +347,95 @@ The full and authoritative directory and file structure must always be placed at
 │   │   ├── v1/
 │   │   │   ├── endpoints/
 │   │   │   │   ├── users.py
-│   │   │   │   └── items.py
-│   │   │   ├── dependencies.py      # DI común (auth, db, etc.)
+│   │   │   │   ├── items.py
+│   │   │   │   ├── orders.py            # pedidos (futuro)
+│   │   │   │   └── admin.py             # backoffice (futuro)
+│   │   │   │
+│   │   │   ├── dependencies.py          # DI común (auth, db, request_id)
 │   │   │   └── __init__.py
 │   │   └── __init__.py
 │   │
 │   ├── core/
-│   │   ├── config.py                # settings, env, feature flags
-│   │   ├── security.py              # auth, hashing, tokens
-│   │   ├── logging.py               # logging config (JSON + HTML)
-│   │   └── exceptions.py            # custom exceptions
+│   │   ├── config.py                    # settings, env, feature flags
+│   │   ├── security.py                  # auth, hashing, tokens
+│   │   ├── logging.py                   # logging config (JSON + HTML)
+│   │   ├── exceptions.py                # global/custom exceptions
+│   │   └── constants.py                 # enums, shared constants
 │   │
 │   ├── db/
 │   │   ├── database.py
 │   │   ├── session.py
-│   │   ├── migrations/              # alembic versions
+│   │   ├── migrations/
 │   │   │   └── versions/
 │   │   └── __init__.py
 │   │
 │   ├── domain/
-│   │   ├── models/                  # domain entities
-│   │   │   ├── user.py
-│   │   │   └── item.py
+│   │   ├── users/
+│   │   │   ├── entities.py              # User, Role
+│   │   │   ├── value_objects.py
+│   │   │   └── exceptions.py
+│   │   │
+│   │   ├── catalog/
+│   │   │   ├── product.py               # Product
+│   │   │   ├── category.py              # Category
+│   │   │   └── exceptions.py
+│   │   │
+│   │   ├── orders/
+│   │   │   ├── order.py                 # Order aggregate
+│   │   │   ├── order_item.py
+│   │   │   ├── status.py                # OrderStatus enum
+│   │   │   └── exceptions.py
+│   │   │
 │   │   └── __init__.py
 │   │
 │   ├── schemas/
-│   │   ├── user.py                  # request/response DTOs
-│   │   └── item.py
+│   │   ├── user.py                      # API DTOs
+│   │   ├── item.py
+│   │   ├── order.py
+│   │   └── common.py
 │   │
-│   ├── repositories/                # Repository Pattern
+│   ├── repositories/
 │   │   ├── user_repository.py
-│   │   └── item_repository.py
+│   │   ├── item_repository.py
+│   │   └── order_repository.py
 │   │
 │   ├── services/
 │   │   ├── user_service.py
-│   │   └── item_service.py
+│   │   ├── item_service.py
+│   │   ├── order_service.py
+│   │   ├── auth_service.py
+│   │   └── payment_service.py           # orquestación (sin gateway aún)
+│   │
+│   ├── infrastructure/
+│   │   ├── payments/
+│   │   │   ├── payment_client.py         # adapter
+│   │   │   ├── circuit_breaker.py        # circuit breaker
+│   │   │   ├── retry_policy.py
+│   │   │   └── exceptions.py
+│   │   │
+│   │   └── __init__.py
 │   │
 │   ├── utils/
 │   │   ├── uuid.py
 │   │   ├── datetime.py
-│   │   └── validators.py
+│   │   ├── validators.py
+│   │   └── idempotency.py
 │   │
-│   └── main.py                      # FastAPI entry point
+│   └── main.py                          # FastAPI entry point
 │
 ├── tests/
 │   ├── api/
 │   ├── services/
 │   ├── repositories/
 │   ├── domain/
+│   │   ├── users/
+│   │   ├── catalog/
+│   │   └── orders/
 │   └── conftest.py
 │
 ├── .env
 ├── requirements.txt
 ├── Dockerfile
 ├── README.md
-└── agents.md                        
+└── agents.md
+                     

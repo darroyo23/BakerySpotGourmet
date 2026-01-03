@@ -1,13 +1,14 @@
-"""
-Item Repository.
-Handles database operations for Item entities.
-"""
-
-# from sqlalchemy.orm import Session
-# from bakerySpotGourmet.domain.models.item import Item
+from typing import List, Optional
+from bakerySpotGourmet.domain.catalog.product import Product
 
 class ItemRepository:
-    """
-    Item Repository implementation.
-    """
-    pass
+    def __init__(self):
+        # Dummy in-memory data
+        self._items = {
+            1: Product(id=1, name="Croissant", price=2.50, description="Buttery flaky pastry"),
+            2: Product(id=2, name="Baguette", price=1.50, description="French bread"),
+            3: Product(id=3, name="Espresso", price=3.00, description="Strong coffee"),
+        }
+
+    def get_by_id(self, item_id: int) -> Optional[Product]:
+        return self._items.get(item_id)

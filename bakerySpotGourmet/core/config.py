@@ -12,6 +12,12 @@ class Settings(BaseSettings):
     ALLOWED_HOSTS: Union[List[str], str] = ["*"]
     CORS_ORIGINS: Union[List[str], str] = []
     LOG_LEVEL: str = "INFO"
+    
+    # Security
+    SECRET_KEY: str = "CHANGE_THIS_TO_A_SECURE_SECRET_KEY"  # In prod, this must come from env
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     model_config = SettingsConfigDict(
         env_file=".env",

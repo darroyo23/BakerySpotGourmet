@@ -1,13 +1,12 @@
-"""
-User Repository.
-Handles database operations for User entities.
-"""
-
-# from sqlalchemy.orm import Session
-# from bakerySpotGourmet.domain.models.user import User
+from typing import Optional
+from bakerySpotGourmet.domain.users.entities import UserIdentity
 
 class UserRepository:
-    """
-    User Repository implementation.
-    """
-    pass
+
+    def get_by_email(self, email: str) -> Optional[UserIdentity]:
+        # TODO: Implement actual DB access
+        return None
+
+    def get_by_id(self, user_id: int) -> Optional[UserIdentity]:
+        # TODO: Implement actual DB access
+        return None
