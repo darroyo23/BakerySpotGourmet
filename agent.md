@@ -342,25 +342,27 @@ Logging sensitive data
 Important:
 The full and authoritative directory and file structure must always be placed at the end of this document and treated as the source of truth.
 .
+.
 ├── bakerySpotGourmet/
 │   ├── api/
 │   │   ├── v1/
 │   │   │   ├── endpoints/
 │   │   │   │   ├── users.py
 │   │   │   │   ├── items.py
-│   │   │   │   ├── orders.py            # pedidos (futuro)
-│   │   │   │   └── admin.py             # backoffice (futuro)
+│   │   │   │   ├── orders.py
+│   │   │   │   └── admin.py
 │   │   │   │
-│   │   │   ├── dependencies.py          # DI común (auth, db, request_id)
+│   │   │   ├── dependencies.py          # auth, db, request_id, rate limit
 │   │   │   └── __init__.py
 │   │   └── __init__.py
 │   │
 │   ├── core/
-│   │   ├── config.py                    # settings, env, feature flags
-│   │   ├── security.py                  # auth, hashing, tokens
-│   │   ├── logging.py                   # logging config (JSON + HTML)
-│   │   ├── exceptions.py                # global/custom exceptions
-│   │   └── constants.py                 # enums, shared constants
+│   │   ├── config.py                    # env, timeouts, rate limits
+│   │   ├── security.py                  # auth, hashing, rate limiting
+│   │   ├── logging.py                   # structured + HTML logs
+│   │   ├── exceptions.py                # global exception handlers
+│   │   ├── constants.py                 # enums, roles, limits
+│   │   └── middleware.py                # request_id, logging, timing
 │   │
 │   ├── db/
 │   │   ├── database.py
@@ -371,48 +373,55 @@ The full and authoritative directory and file structure must always be placed at
 │   │
 │   ├── domain/
 │   │   ├── users/
-│   │   │   ├── entities.py              # User, Role
+│   │   │   ├── entities.py
 │   │   │   ├── value_objects.py
 │   │   │   └── exceptions.py
 │   │   │
 │   │   ├── catalog/
-│   │   │   ├── product.py               # Product
-│   │   │   ├── category.py              # Category
+│   │   │   ├── product.py
+│   │   │   ├── category.py
 │   │   │   └── exceptions.py
 │   │   │
 │   │   ├── orders/
-│   │   │   ├── order.py                 # Order aggregate
+│   │   │   ├── order.py
 │   │   │   ├── order_item.py
-│   │   │   ├── status.py                # OrderStatus enum
+│   │   │   ├── order_type.py
+│   │   │   ├── status.py
+│   │   │   └── exceptions.py
+│   │   │
+│   │   ├── payments/
+│   │   │   ├── payment.py
+│   │   │   ├── status.py
 │   │   │   └── exceptions.py
 │   │   │
 │   │   └── __init__.py
 │   │
 │   ├── schemas/
-│   │   ├── user.py                      # API DTOs
+│   │   ├── user.py
 │   │   ├── item.py
 │   │   ├── order.py
+│   │   ├── payment.py
 │   │   └── common.py
 │   │
 │   ├── repositories/
 │   │   ├── user_repository.py
 │   │   ├── item_repository.py
-│   │   └── order_repository.py
+│   │   ├── order_repository.py
+│   │   └── payment_repository.py
 │   │
 │   ├── services/
 │   │   ├── user_service.py
 │   │   ├── item_service.py
 │   │   ├── order_service.py
 │   │   ├── auth_service.py
-│   │   └── payment_service.py           # orquestación (sin gateway aún)
+│   │   └── payment_service.py
 │   │
 │   ├── infrastructure/
 │   │   ├── payments/
-│   │   │   ├── payment_client.py         # adapter
-│   │   │   ├── circuit_breaker.py        # circuit breaker
+│   │   │   ├── payment_client.py
+│   │   │   ├── circuit_breaker.py
 │   │   │   ├── retry_policy.py
 │   │   │   └── exceptions.py
-│   │   │
 │   │   └── __init__.py
 │   │
 │   ├── utils/
@@ -421,7 +430,7 @@ The full and authoritative directory and file structure must always be placed at
 │   │   ├── validators.py
 │   │   └── idempotency.py
 │   │
-│   └── main.py                          # FastAPI entry point
+│   └── main.py
 │
 ├── tests/
 │   ├── api/
@@ -430,12 +439,12 @@ The full and authoritative directory and file structure must always be placed at
 │   ├── domain/
 │   │   ├── users/
 │   │   ├── catalog/
-│   │   └── orders/
+│   │   ├── orders/
+│   │   └── payments/
 │   └── conftest.py
 │
 ├── .env
 ├── requirements.txt
 ├── Dockerfile
 ├── README.md
-└── agents.md
-                     
+└── agent.md

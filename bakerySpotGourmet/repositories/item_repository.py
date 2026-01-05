@@ -12,3 +12,10 @@ class ItemRepository:
 
     def get_by_id(self, item_id: int) -> Optional[Product]:
         return self._items.get(item_id)
+    
+    def save(self, product: Product) -> Product:
+        """
+        Save a product to the repository.
+        """
+        self._items[product.id] = product
+        return product

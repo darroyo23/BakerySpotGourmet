@@ -18,6 +18,20 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    
+    # Timeouts (in seconds)
+    HTTP_CLIENT_TIMEOUT: int = 30
+    DATABASE_TIMEOUT: int = 10
+    EXTERNAL_SERVICE_TIMEOUT: int = 15
+    
+    # Rate Limiting
+    RATE_LIMIT_ENABLED: bool = True
+    RATE_LIMIT_PER_MINUTE: int = 100
+    RATE_LIMIT_BURST: int = 20
+    
+    # Idempotency
+    IDEMPOTENCY_ENABLED: bool = True
+    IDEMPOTENCY_TTL_SECONDS: int = 86400  # 24 hours
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -4,7 +4,7 @@ Common dependency injection.
 """
 from typing import Generator, Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from pydantic import ValidationError
@@ -30,18 +30,29 @@ def get_order_repository() -> "OrderRepository": # type: ignore
     from bakerySpotGourmet.repositories.order_repository import OrderRepository
     return OrderRepository()
 
+def get_payment_repository() -> "PaymentRepository": # type: ignore
+    from bakerySpotGourmet.repositories.payment_repository import PaymentRepository
+    return PaymentRepository()
+
 def get_auth_service(
     user_repo: Annotated[UserRepository, Depends(get_user_repository)]
 ) -> "AuthService": # type: ignore
     from bakerySpotGourmet.services.auth_service import AuthService
     return AuthService(user_repo)
 
+def get_payment_service(
+    payment_repo: Annotated["PaymentRepository", Depends(get_payment_repository)]
+) -> "PaymentService": # type: ignore
+    from bakerySpotGourmet.services.payment_service import PaymentService
+    return PaymentService(payment_repo)
+
 def get_order_service(
     order_repo: Annotated["OrderRepository", Depends(get_order_repository)],
+    payment_repo: Annotated["PaymentRepository", Depends(get_payment_repository)],
     item_repo: Annotated["ItemRepository", Depends(get_item_repository)],
 ) -> "OrderService": # type: ignore
     from bakerySpotGourmet.services.order_service import OrderService
-    return OrderService(order_repo, item_repo)
+    return OrderService(order_repo, payment_repo, item_repo)
 
 async def get_current_user(
     token: Annotated[str, Depends(reusable_oauth2)],
@@ -95,3 +106,40 @@ class RoleChecker:
                 detail="The user doesn't have enough privileges"
             )
         return user
+
+
+def get_request_id(request: Request) -> str:
+    """
+    Get request ID from request state.
+    
+    Args:
+        request: The FastAPI request object
+        
+    Returns:
+        The request ID
+    """
+    return getattr(request.state, "request_id", "unknown")
+
+
+def rate_limit_dependency(endpoint: str = "default"):
+    """
+    Create a rate limiting dependency for an endpoint.
+    
+    Args:
+        endpoint: Endpoint identifier for rate limiting
+        
+    Returns:
+        Dependency function
+    """
+    def _rate_limit(
+        current_user: Annotated[UserIdentity, Depends(get_current_user)],
+        request: Request,
+    ) -> None:
+        """Check rate limit for current user."""
+        from bakerySpotGourmet.core.security import check_rate_limit
+        
+        # Use user ID as identifier for rate limiting
+        identifier = f"user:{current_user.id}"
+        check_rate_limit(identifier, endpoint)
+    
+    return _rate_limit
