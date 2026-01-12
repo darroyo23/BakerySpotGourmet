@@ -16,4 +16,4 @@ Write-Host "Swagger UI: http://127.0.0.1:8000/docs"
 # --reload: Auto-reload on code changes
 # --host 127.0.0.1: Localhost
 # --port 8000: Standard port
-uvicorn bakerySpotGourmet.main:app --reload --host 127.0.0.1 --port 8000
+uvicorn backend.bakerySpotGourmet.main:app --reload --host 127.0.0.1 --port 8000

@@ -332,117 +332,113 @@ Direct DB access from API layer
 Ignoring errors or exceptions
 
 Skipping tests
-
-Skipping documentation
-
-Logging sensitive data
-
 16. Project Structure
 
 Important:
 The full and authoritative directory and file structure must always be placed at the end of this document and treated as the source of truth.
 .
-.
-├── bakerySpotGourmet/
-│   ├── api/
-│   │   ├── v1/
-│   │   │   ├── endpoints/
-│   │   │   │   ├── users.py
-│   │   │   │   ├── items.py
-│   │   │   │   ├── orders.py
-│   │   │   │   └── admin.py
-│   │   │   │
-│   │   │   ├── dependencies.py          # auth, db, request_id, rate limit
+├── backend/
+│   ├── bakerySpotGourmet/
+│   │   ├── api/
+│   │   │   ├── v1/
+│   │   │   │   ├── endpoints/
+│   │   │   │   │   ├── users.py
+│   │   │   │   │   ├── items.py
+│   │   │   │   │   ├── orders.py
+│   │   │   │   │   └── admin.py
+│   │   │   │   │
+│   │   │   │   ├── dependencies.py          # auth, db, request_id, rate limit
+│   │   │   │   └── __init__.py
 │   │   │   └── __init__.py
-│   │   └── __init__.py
-│   │
-│   ├── core/
-│   │   ├── config.py                    # env, timeouts, rate limits
-│   │   ├── security.py                  # auth, hashing, rate limiting
-│   │   ├── logging.py                   # structured + HTML logs
-│   │   ├── exceptions.py                # global exception handlers
-│   │   ├── constants.py                 # enums, roles, limits
-│   │   └── middleware.py                # request_id, logging, timing
-│   │
-│   ├── db/
-│   │   ├── database.py
-│   │   ├── session.py
-│   │   ├── migrations/
-│   │   │   └── versions/
-│   │   └── __init__.py
-│   │
-│   ├── domain/
-│   │   ├── users/
-│   │   │   ├── entities.py
-│   │   │   ├── value_objects.py
-│   │   │   └── exceptions.py
 │   │   │
-│   │   ├── catalog/
-│   │   │   ├── product.py
-│   │   │   ├── category.py
-│   │   │   └── exceptions.py
+│   │   ├── core/
+│   │   │   ├── config.py                    # env, timeouts, rate limits
+│   │   │   ├── security.py                  # auth, hashing, rate limiting
+│   │   │   ├── logging.py                   # structured + HTML logs
+│   │   │   ├── exceptions.py                # global exception handlers
+│   │   │   ├── constants.py                 # enums, roles, limits
+│   │   │   └── middleware.py                # request_id, logging, timing
 │   │   │
-│   │   ├── orders/
+│   │   ├── db/
+│   │   │   ├── database.py
+│   │   │   ├── session.py
+│   │   │   ├── migrations/
+│   │   │   │   └── versions/
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── domain/
+│   │   │   ├── users/
+│   │   │   │   ├── entities.py
+│   │   │   │   ├── value_objects.py
+│   │   │   │   └── exceptions.py
+│   │   │   │
+│   │   │   ├── catalog/
+│   │   │   │   ├── product.py
+│   │   │   │   ├── category.py
+│   │   │   │   └── exceptions.py
+│   │   │   │
+│   │   │   ├── orders/
+│   │   │   │   ├── order.py
+│   │   │   │   ├── order_item.py
+│   │   │   │   ├── order_type.py
+│   │   │   │   ├── status.py
+│   │   │   │   └── exceptions.py
+│   │   │   │
+│   │   │   ├── payments/
+│   │   │   │   ├── payment.py
+│   │   │   │   ├── status.py
+│   │   │   │   └── exceptions.py
+│   │   │   │
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── schemas/
+│   │   │   ├── user.py
+│   │   │   ├── item.py
 │   │   │   ├── order.py
-│   │   │   ├── order_item.py
-│   │   │   ├── order_type.py
-│   │   │   ├── status.py
-│   │   │   └── exceptions.py
-│   │   │
-│   │   ├── payments/
 │   │   │   ├── payment.py
-│   │   │   ├── status.py
-│   │   │   └── exceptions.py
+│   │   │   └── common.py
 │   │   │
-│   │   └── __init__.py
+│   │   ├── repositories/
+│   │   │   ├── user_repository.py
+│   │   │   ├── item_repository.py
+│   │   │   ├── order_repository.py
+│   │   │   └── payment_repository.py
+│   │   │
+│   │   ├── services/
+│   │   │   ├── user_service.py
+│   │   │   ├── item_service.py
+│   │   │   ├── order_service.py
+│   │   │   ├── auth_service.py
+│   │   │   └── payment_service.py
+│   │   │
+│   │   ├── infrastructure/
+│   │   │   ├── payments/
+│   │   │   │   ├── payment_client.py
+│   │   │   │   ├── circuit_breaker.py
+│   │   │   │   ├── retry_policy.py
+│   │   │   │   └── exceptions.py
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── utils/
+│   │   │   ├── uuid.py
+│   │   │   ├── datetime.py
+│   │   │   ├── validators.py
+│   │   │   └── idempotency.py
+│   │   │
+│   │   └── main.py
 │   │
-│   ├── schemas/
-│   │   ├── user.py
-│   │   ├── item.py
-│   │   ├── order.py
-│   │   ├── payment.py
-│   │   └── common.py
-│   │
-│   ├── repositories/
-│   │   ├── user_repository.py
-│   │   ├── item_repository.py
-│   │   ├── order_repository.py
-│   │   └── payment_repository.py
-│   │
-│   ├── services/
-│   │   ├── user_service.py
-│   │   ├── item_service.py
-│   │   ├── order_service.py
-│   │   ├── auth_service.py
-│   │   └── payment_service.py
-│   │
-│   ├── infrastructure/
-│   │   ├── payments/
-│   │   │   ├── payment_client.py
-│   │   │   ├── circuit_breaker.py
-│   │   │   ├── retry_policy.py
-│   │   │   └── exceptions.py
-│   │   └── __init__.py
-│   │
-│   ├── utils/
-│   │   ├── uuid.py
-│   │   ├── datetime.py
-│   │   ├── validators.py
-│   │   └── idempotency.py
-│   │
-│   └── main.py
+│   └── tests/
+│       ├── api/
+│       ├── services/
+│       ├── repositories/
+│       ├── domain/
+│       │   ├── users/
+│       │   ├── catalog/
+│       │   ├── orders/
+│       │   └── payments/
+│       └── conftest.py
 │
-├── tests/
-│   ├── api/
-│   ├── services/
-│   ├── repositories/
-│   ├── domain/
-│   │   ├── users/
-│   │   ├── catalog/
-│   │   ├── orders/
-│   │   └── payments/
-│   └── conftest.py
-│
+├── frontend/
 ├── .env
 ├── requirements.txt
 ├── Dockerfile

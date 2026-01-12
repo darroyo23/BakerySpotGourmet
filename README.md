@@ -38,10 +38,10 @@ Run the PowerShell script which handles environment activation and PYTHONPATH:
 
 ### Option 2: Manual Execution
 
-Ensure you are at the project root (the folder where you downloaded the repository) and run:
+Ensure you are at the project root and run:
 
 ```powershell
-.\.venv\Scripts\uvicorn bakerySpotGourmet.main:app --reload
+.\.venv\Scripts\uvicorn backend.bakerySpotGourmet.main:app --reload
 ```
 
 The API will be available at:
@@ -59,8 +59,14 @@ To run the test suite:
 ## Project Structure
 
 This project follows a Clean / Hexagonal Architecture:
-- `bakerySpotGourmet/api`: HTTP Layer (Controllers/Routers)
-- `bakerySpotGourmet/core`: Configuration, Logging, Exceptions
-- `bakerySpotGourmet/services`: Business Logic
-- `bakerySpotGourmet/repositories`: Data Access
-- `bakerySpotGourmet/domain`: Domain Models
+
+### Root Layout
+- `/backend`: API, domain, services, infrastructure.
+- `/frontend`: Web client (placeholder).
+
+### Backend Details
+- `backend/bakerySpotGourmet/api`: HTTP Layer (Controllers/Routers)
+- `backend/bakerySpotGourmet/core`: Configuration, Logging, Exceptions
+- `backend/bakerySpotGourmet/services`: Business Logic
+- `backend/bakerySpotGourmet/repositories`: Data Access
+- `backend/bakerySpotGourmet/domain`: Domain Models
