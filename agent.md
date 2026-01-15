@@ -380,8 +380,19 @@ The full and authoritative directory and file structure must always be placed at
 │   │   │   ├── orders/
 │   │   │   │   ├── order.py
 │   │   │   │   ├── order_item.py
-│   │   │   │   ├── order_type.py
 │   │   │   │   ├── status.py
+│   │   │   │   └── exceptions.py
+│   │   │   │
+│   │   │   ├── business_rules/
+│   │   │   │   ├── fulfillment.py
+│   │   │   │   └── exceptions.py
+│   │   │   │
+│   │   │   ├── combos/
+│   │   │   │   ├── entities.py
+│   │   │   │   └── exceptions.py
+│   │   │   │
+│   │   │   ├── limits/
+│   │   │   │   ├── entities.py
 │   │   │   │   └── exceptions.py
 │   │   │   │
 │   │   │   ├── payments/
@@ -435,6 +446,9 @@ The full and authoritative directory and file structure must always be placed at
 │       │   ├── users/
 │       │   ├── catalog/
 │       │   ├── orders/
+│       │   ├── business_rules/
+│       │   ├── combos/
+│       │   ├── limits/
 │       │   └── payments/
 │       └── conftest.py
 │

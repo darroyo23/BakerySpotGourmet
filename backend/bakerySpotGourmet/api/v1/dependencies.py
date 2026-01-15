@@ -11,7 +11,7 @@ from pydantic import ValidationError
 
 from bakerySpotGourmet.core import security
 from bakerySpotGourmet.core.config import settings
-from bakerySpotGourmet.domain.users.entities import UserIdentity, Role
+from bakerySpotGourmet.domain.users.entities import UserIdentity, RoleName
 from bakerySpotGourmet.repositories.user_repository import UserRepository
 from bakerySpotGourmet.schemas.user import TokenPayload
 
@@ -96,7 +96,7 @@ async def get_current_active_superuser(
     return current_user
 
 class RoleChecker:
-    def __init__(self, allowed_roles: list[Role]):
+    def __init__(self, allowed_roles: list[RoleName]):
         self.allowed_roles = allowed_roles
 
     def __call__(self, user: Annotated[UserIdentity, Depends(get_current_user)]) -> UserIdentity:

@@ -1,26 +1,38 @@
 from enum import Enum
 from dataclasses import dataclass, field
-from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
-class Role(str, Enum):
+
+class RoleName(str, Enum):
+    """Enumeration of user roles."""
     ADMIN = "admin"
-    MANAGER = "manager"
     STAFF = "staff"
     CUSTOMER = "customer"
 
+
 @dataclass
-class UserIdentity:
+class Role:
+    """Role domain entity."""
+    id: int
+    name: RoleName
+
+
+@dataclass
+class User:
     """
-    User Core Entity.
-    Pure Python class, no ORM dependencies here.
+    User domain entity.
+    Pure Python class, no framework dependencies.
     """
-    id: Optional[int]
+    id: UUID
     email: str
-    hashed_password: str
+    role: Role
     is_active: bool = True
-    is_superuser: bool = False
-    full_name: Optional[str] = None
-    role: Role = Role.CUSTOMER
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+
+    def deactivate(self) -> None:
+        """Deactivate the user account."""
+        self.is_active = False
+
+
+# Temporary alias for backward compatibility
+UserIdentity = User

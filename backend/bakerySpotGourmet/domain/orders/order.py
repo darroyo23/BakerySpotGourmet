@@ -1,39 +1,21 @@
-"""
-Order domain entity.
-Contains business rules for order lifecycle and state transitions.
-"""
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional, Dict, Set
+from typing import List, Optional
+from uuid import UUID
 
 from bakerySpotGourmet.domain.orders.status import OrderStatus
-from bakerySpotGourmet.domain.orders.order_type import OrderType
-from bakerySpotGourmet.domain.payments.status import PaymentStatus
-from bakerySpotGourmet.domain.orders.exceptions import InvalidOrderStatusTransitionException
-
-
-# Valid state transitions map (strictly operational)
-VALID_TRANSITIONS: Dict[OrderStatus, Set[OrderStatus]] = {
-    OrderStatus.PENDING: {OrderStatus.CONFIRMED, OrderStatus.CANCELLED},
-    OrderStatus.CONFIRMED: {OrderStatus.PREPARING, OrderStatus.CANCELLED},
-    OrderStatus.PREPARING: {OrderStatus.READY, OrderStatus.CANCELLED},
-    OrderStatus.READY: {OrderStatus.DELIVERED, OrderStatus.CANCELLED},
-    OrderStatus.DELIVERED: set(),  # Terminal state
-    OrderStatus.CANCELLED: set(),  # Terminal state
-}
+from bakerySpotGourmet.domain.business_rules.fulfillment import FulfillmentType
 
 
 @dataclass
 class OrderItem:
     """
-    OrderItem Value Object / Entity.
+    OrderItem domain entity.
     """
-    product_id: int
+    product_id: UUID
     quantity: int
     unit_price: float
-    product_name: str  # Snapshot of product name at time of order
 
-    @property
     def subtotal(self) -> float:
         """Calculate subtotal for this item."""
         return self.quantity * self.unit_price
@@ -45,71 +27,75 @@ class Order:
     Order Aggregate Root.
     Contains business rules for order lifecycle and state transitions.
     """
-    customer_id: int
-    order_type: OrderType = field(default=OrderType.PICKUP)
+    id: UUID
+    user_id: UUID
+    fulfillment_type: FulfillmentType
+    status: OrderStatus = OrderStatus.PENDING
+    payment_confirmed: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
     items: List[OrderItem] = field(default_factory=list)
-    status: OrderStatus = field(default=OrderStatus.PENDING)
-    payment_status: PaymentStatus = field(default=PaymentStatus.PENDING)
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
-    id: Optional[int] = field(default=None)
-    
+
     @property
-    def total_amount(self) -> float:
+    def total(self) -> float:
         """Calculate total amount for the order."""
-        return sum(item.subtotal for item in self.items)
-    
-    def add_item(self, product_id: int, product_name: str, price: float, quantity: int) -> None:
+        return sum(item.subtotal() for item in self.items)
+
+    def add_item(self, product_id: UUID, quantity: int, unit_price: float) -> None:
         """
         Add an item to the order.
         
-        Args:
-            product_id: ID of the product
-            product_name: Name of the product (snapshot)
-            price: Unit price
-            quantity: Quantity ordered
-            
-        Raises:
-            ValueError: If quantity is not positive
+        Items can only be added while status is PENDING.
         """
+        if self.status != OrderStatus.PENDING:
+            raise ValueError("Items can only be added when order is in PENDING status")
+        
         if quantity <= 0:
             raise ValueError("Quantity must be positive")
-        
+
         item = OrderItem(
             product_id=product_id,
-            product_name=product_name,
-            unit_price=price,
-            quantity=quantity
+            quantity=quantity,
+            unit_price=unit_price
         )
         self.items.append(item)
-    
-    def can_transition_to(self, new_status: OrderStatus) -> bool:
+
+    def transition_to(self, new_status: OrderStatus) -> None:
         """
-        Check if the order can transition to the given status.
+        Transition the order to a new status following strict business rules.
+        """
+        if new_status == self.status:
+            return
+
+        if new_status == OrderStatus.CONFIRMED:
+            if self.status != OrderStatus.PENDING:
+                raise ValueError("Can only confirm a PENDING order")
+            if not self.items:
+                raise ValueError("Order must contain at least one item to be confirmed")
         
-        Args:
-            new_status: The target status
-            
-        Returns:
-            True if transition is valid, False otherwise
-        """
-        return new_status in VALID_TRANSITIONS.get(self.status, set())
-    
-    def change_status(self, new_status: OrderStatus) -> None:
-        """
-        Change the order status with validation.
+        elif new_status == OrderStatus.PREPARING:
+            if self.status != OrderStatus.CONFIRMED:
+                raise ValueError("Can only start preparing from CONFIRMED status")
         
-        Args:
-            new_status: The new status to transition to
-            
-        Raises:
-            InvalidOrderStatusTransitionException: If transition is not valid
-        """
-        if not self.can_transition_to(new_status):
-            raise InvalidOrderStatusTransitionException(
-                current_status=self.status.value,
-                new_status=new_status.value
-            )
+        elif new_status == OrderStatus.READY:
+            if self.status != OrderStatus.PREPARING:
+                raise ValueError("Only PREPARING orders can be marked as READY")
         
+        elif new_status == OrderStatus.ON_THE_WAY:
+            if self.status != OrderStatus.PREPARING:
+                # Based on rules: preparing -> ready | on_the_way
+                raise ValueError("Order must be PREPARING to go ON_THE_WAY")
+            if self.fulfillment_type != FulfillmentType.DELIVERY:
+                raise ValueError("Only delivery orders can be ON_THE_WAY")
+        
+        elif new_status == OrderStatus.DELIVERED:
+            if self.status not in (OrderStatus.READY, OrderStatus.ON_THE_WAY):
+                raise ValueError("Order must be READY or ON_THE_WAY to be DELIVERED")
+        
+        elif new_status == OrderStatus.CANCELLED:
+            if self.status in (OrderStatus.DELIVERED, OrderStatus.ON_THE_WAY):
+                 raise ValueError("Cannot cancel a delivered or in-transit order")
+        
+        else:
+            raise ValueError(f"Invalid state transition to {new_status}")
+
         self.status = new_status
-        self.updated_at = datetime.utcnow()

@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from bakerySpotGourmet.api.v1 import dependencies as deps
 from bakerySpotGourmet.core.exceptions import EntityNotFoundException
-from bakerySpotGourmet.domain.users.entities import UserIdentity, Role
+from bakerySpotGourmet.domain.users.entities import UserIdentity, RoleName
 from bakerySpotGourmet.domain.orders.status import OrderStatus
 from bakerySpotGourmet.domain.orders.exceptions import InvalidOrderStatusTransitionException
 from bakerySpotGourmet.schemas.order import OrderResponse, OrderStatusUpdate
@@ -22,7 +22,7 @@ router = APIRouter()
 
 @router.get("/orders", response_model=List[OrderResponse])
 async def list_orders(
-    current_user: Annotated[UserIdentity, Depends(deps.RoleChecker([Role.ADMIN, Role.STAFF]))],
+    current_user: Annotated[UserIdentity, Depends(deps.RoleChecker([RoleName.ADMIN, RoleName.STAFF]))],
     order_service: Annotated[OrderService, Depends(deps.get_order_service)],
     skip: int = Query(0, ge=0, description="Number of orders to skip"),
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of orders to return"),
@@ -48,7 +48,7 @@ async def list_orders(
 @router.get("/orders/{order_id}", response_model=OrderResponse)
 async def get_order(
     order_id: int,
-    current_user: Annotated[UserIdentity, Depends(deps.RoleChecker([Role.ADMIN, Role.STAFF]))],
+    current_user: Annotated[UserIdentity, Depends(deps.RoleChecker([RoleName.ADMIN, RoleName.STAFF]))],
     order_service: Annotated[OrderService, Depends(deps.get_order_service)],
 ) -> Any:
     """
@@ -70,7 +70,7 @@ async def get_order(
 async def update_order_status(
     order_id: int,
     status_update: OrderStatusUpdate,
-    current_user: Annotated[UserIdentity, Depends(deps.RoleChecker([Role.ADMIN, Role.STAFF]))],
+    current_user: Annotated[UserIdentity, Depends(deps.RoleChecker([RoleName.ADMIN, RoleName.STAFF]))],
     order_service: Annotated[OrderService, Depends(deps.get_order_service)],
 ) -> Any:
     """
@@ -85,7 +85,7 @@ async def update_order_status(
         404: If order not found
     """
     # Check if STAFF is trying to cancel
-    if current_user.role == Role.STAFF and status_update.status == OrderStatus.CANCELLED:
+    if current_user.role == RoleName.STAFF and status_update.status == OrderStatus.CANCELLED:
         logger.warning(
             "staff_cancel_attempt_denied",
             admin_user_id=current_user.id,
