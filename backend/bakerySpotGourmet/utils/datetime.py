@@ -3,10 +3,12 @@ DateTime utilities.
 Standardized datetime operations.
 """
 
-from datetime import datetime, timezone
+from datetime import datetime
+import zoneinfo
+from bakerySpotGourmet.core.config import settings
 
-def utc_now() -> datetime:
+def get_now() -> datetime:
     """
-    Get current UTC datetime.
+    Get current datetime in the configured timezone (Costa Rica).
     """
-    return datetime.now(timezone.utc)
+    return datetime.now(zoneinfo.ZoneInfo(settings.TIMEZONE))

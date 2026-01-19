@@ -1,10 +1,11 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Any, Union
 
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 
 from bakerySpotGourmet.core.config import settings
+from bakerySpotGourmet.utils.datetime import get_now
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
@@ -28,9 +29,9 @@ def create_access_token(subject: Union[str, Any], expires_delta: timedelta | Non
     Create a JWT access token.
     """
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = get_now() + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = get_now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     
     to_encode = {"exp": expire, "sub": str(subject), "type": "access"}
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
@@ -42,9 +43,9 @@ def create_refresh_token(subject: Union[str, Any], expires_delta: timedelta | No
     Create a JWT refresh token.
     """
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = get_now() + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        expire = get_now() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     
     to_encode = {"exp": expire, "sub": str(subject), "type": "refresh"}
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)

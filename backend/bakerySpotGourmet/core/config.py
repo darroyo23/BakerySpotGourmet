@@ -6,32 +6,33 @@ from pydantic import AnyHttpUrl, field_validator
 
 class Settings(BaseSettings):
     PROJECT_NAME: str
-    VERSION: str = "1.0.0"
-    API_V1_STR: str = "/api/v1"
-    DEBUG: bool = False
-    ALLOWED_HOSTS: Union[List[str], str] = ["*"]
-    CORS_ORIGINS: Union[List[str], str] = []
-    LOG_LEVEL: str = "INFO"
+    VERSION: str
+    API_V1_STR: str
+    DEBUG: bool
+    ALLOWED_HOSTS: Union[List[str], str]
+    CORS_ORIGINS: Union[List[str], str]
+    LOG_LEVEL: str
+    TIMEZONE: str
     
     # Security
-    SECRET_KEY: str = "CHANGE_THIS_TO_A_SECURE_SECRET_KEY"  # In prod, this must come from env
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    SECRET_KEY: str
+    ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    REFRESH_TOKEN_EXPIRE_DAYS: int
     
     # Timeouts (in seconds)
-    HTTP_CLIENT_TIMEOUT: int = 30
-    DATABASE_TIMEOUT: int = 10
-    EXTERNAL_SERVICE_TIMEOUT: int = 15
+    HTTP_CLIENT_TIMEOUT: int
+    DATABASE_TIMEOUT: int
+    EXTERNAL_SERVICE_TIMEOUT: int
     
     # Rate Limiting
-    RATE_LIMIT_ENABLED: bool = True
-    RATE_LIMIT_PER_MINUTE: int = 100
-    RATE_LIMIT_BURST: int = 20
+    RATE_LIMIT_ENABLED: bool
+    RATE_LIMIT_PER_MINUTE: int
+    RATE_LIMIT_BURST: int
     
     # Idempotency
-    IDEMPOTENCY_ENABLED: bool = True
-    IDEMPOTENCY_TTL_SECONDS: int = 86400  # 24 hours
+    IDEMPOTENCY_ENABLED: bool
+    IDEMPOTENCY_TTL_SECONDS: int
 
     model_config = SettingsConfigDict(
         env_file=".env",
