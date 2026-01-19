@@ -6,8 +6,8 @@ if (-not (Get-Command "uvicorn" -ErrorAction SilentlyContinue)) {
     & ".\.venv\Scripts\Activate.ps1"
 }
 
-# Add current directory to PYTHONPATH to ensure package resolution works
-$env:PYTHONPATH = "$PWD"
+# Add current directory and backend to PYTHONPATH to ensure package resolution works
+$env:PYTHONPATH = "$PWD;$PWD\backend"
 
 Write-Host "Starting BakerySpotGourmet API..."
 Write-Host "Swagger UI: http://127.0.0.1:8000/docs"
@@ -16,4 +16,4 @@ Write-Host "Swagger UI: http://127.0.0.1:8000/docs"
 # --reload: Auto-reload on code changes
 # --host 127.0.0.1: Localhost
 # --port 8000: Standard port
-uvicorn backend.bakerySpotGourmet.main:app --reload --host 127.0.0.1 --port 8000
+uvicorn bakerySpotGourmet.main:app --reload --host 127.0.0.1 --port 8000
